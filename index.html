@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hospe Chach App — Sistema de Gestión</title>
+<link rel="stylesheet" href="./css/main.css">
+<script>
+// Sistema 100% offline - Bloqueo total de conexiones de red
+(function() {
+  'use strict';
+  
+  // Eliminar WebSocket y prevenir cualquier recreación
+  if (typeof WebSocket !== 'undefined') {
+    const wsProto = WebSocket.prototype;
+    Object.defineProperty(window, 'WebSocket', {
+      get: function() {
+        return function() {
+          throw new Error('WebSocket disabled - system runs offline');
+        };
+      },
+      set: function() {},
+      configurable: false
+    });
+  }
+  
+  // Eliminar Service Worker
+  if ('serviceWorker' in navigator) {
+    Object.defineProperty(navigator, 'serviceWorker', {
+      get: function() {
+        return undefined;
+      },
+      set: function() {},
+      configurable: false
+    });
+  }
+  
+  // Interceptar y silenciar TODOS los errores de consola relacionados con WebSocket
+  const originalError = console.error;
+  const originalWarn = console.warn;
+  
+  function filterWebSocketError(args) {
+    const message = args.join(' ');
+    return message.includes('WebSocket') || message.includes('ws://') || message.includes('127.0.0.1:5501');
+  }
+  
+  console.error = function(...args) {
+    if (filterWebSocketError(args)) return;
+    originalError.apply(console, args);
+  };
+  
+  console.warn = function(...args) {
+    if (filterWebSocketError(args)) return;
+    originalWarn.apply(console, args);
+  };
+  
+  // Interceptar errores globales no capturados relacionados con WebSocket
+  window.addEventListener('error', function(e) {
+    if (e.message && (e.message.includes('WebSocket') || e.message.includes('ws://'))) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+  }, true);
+  
+  // Bloquear fetch a URLs específicas del entorno de desarrollo
+  const originalFetch = window.fetch;
+  window.fetch = function(url, options) {
+    if (typeof url === 'string' && (url.includes('127.0.0.1:5501') || url.includes('ws://'))) {
+      return Promise.reject(new Error('Network request blocked - system runs offline'));
+    }
+    return originalFetch.apply(this, arguments);
+  };
+})();
+</script>
+<script>
+/* Only add manifest & favicon when served via HTTP — they cause CORS errors on file:// */
+if (location.protocol !== 'file:') {
+  const mf = document.createElement('link'); mf.rel = 'manifest'; mf.href = './manifest.json'; document.head.appendChild(mf);
+  const fi = document.createElement('link'); fi.rel = 'icon'; fi.href = './favicon.ico'; document.head.appendChild(fi);
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="apple-touch-icon" href="./icon-192.png">
+</head>
+<body>
+<script>
+window.togglePass=function(btn){
+  const inp=document.getElementById('login-pass');
+  const show=inp.type==='password';
+  inp.type=show?'text':'password';
+  btn.classList.toggle('pass-toggle--show',show);
+  btn.setAttribute('aria-label',show?'Ocultar contraseña':'Mostrar contraseña');
+}
+window.forceClearAppCache = function() {
+  if (confirm('¿Limpiar caché de la aplicación y forzar actualización?\n\nEsto resolverá problemas de contraseñas incorrectas o errores de carga limpiando los archivos antiguos guardados en el navegador.')) {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for (let registration of registrations) {
+          registration.unregister();
+        }
+      });
+    }
+    if ('caches' in window) {
+      caches.keys().then(function(names) {
+        for (let name of names) {
+          caches.delete(name);
+        }
+      });
+    }
+    try {
+      localStorage.removeItem('hotelos_session');
+    } catch(e) {}
+    
+    setTimeout(function() {
+      const url = new URL(window.location.href);
+      url.searchParams.set('reload_ts', String(Date.now()));
+      window.location.replace(url.toString());
+    }, 1000);
+  }
+}
+</script>
+
+<!-- LOGIN -->
+<div id="login-screen" class="hidden">
+  <div class="login-box">
+    <div class="login-logo u-pb-4">
+      <div class="brand-logo-wrap brand-logo-wrap--login" id="login-brand-wrap"><img id="login-brand-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Hospedaje Ku' Kanche" width="128" height="128" decoding="async"></div>
+      <h1 class="login-title-custom">
+        <span class="brand-name">Hospe Chach App</span>
+      </h1>
+      <p>Sistema de Gestión</p>
+    </div>
+    <div class="form-group">
+      <label for="login-user">Usuario</label>
+      <input type="text" id="login-user" placeholder="Ingresa tu usuario" autocomplete="username">
+    </div>
+    <div class="form-group">
+      <label for="login-pass">Contraseña</label>
+      <div class="pass-wrap">
+        <input type="password" id="login-pass" placeholder="Ingresa tu contraseña" autocomplete="current-password">
+        <button type="button" class="pass-toggle" onclick="togglePass(this)" aria-label="Mostrar contraseña">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+        </button>
+      </div>
+    </div>
+    <button type="button" class="btn btn-primary btn-full" onclick="doLogin()">Ingresar al sistema</button>
+    <div class="users-hint">
+      <p class="login-hint-text">Contacte al administrador para obtener acceso</p>
+    </div>
+    <div class="login-version-container">
+      <p class="login-version-text">v1.3.6</p>
+    </div>
+  </div>
+</div>
+
+<!-- SIDEBAR OVERLAY (mobile) -->
+<button type="button" id="sidebar-overlay" aria-label="Cerrar menú lateral" onclick="closeMobileSidebar()"></button>
+
+<!-- BOTTOM NAV (mobile) -->
+<div id="bottom-nav"><div id="bottom-nav-inner"></div></div>
+
+<!-- APP -->
+<div id="app">
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div class="sidebar-header sidebar-header-custom">
+      <div class="brand-logo-wrap brand-logo-wrap--sidebar" id="sidebar-brand-wrap"><img id="sidebar-brand-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Hospedaje Ku' Kanche" width="92" height="92" decoding="async"></div>
+      <h2 class="sidebar-title-custom">
+        <span class="brand-name">Hospe Chach App</span>
+      </h2>
+      <p class="sidebar-sub-custom">Sistema de Gestión</p>
+    </div>
+    <div class="sidebar-user">
+      <div class="sidebar-user-details">
+        <div class="user-avatar" id="user-avatar">A</div>
+        <div class="user-info">
+          <p id="user-name">Admin</p>
+          <span id="user-role">Administrador</span>
+        </div>
+      </div>
+    </div>
+    <div style="padding: 12px;">
+      <div style="position:relative">
+        <input type="text" id="moduleSearchInput" placeholder="Buscar... (Ctrl+K)" 
+               style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:6px;background:var(--dark2);color:var(--text);font-size:0.9em"
+               oninput="filterModulesSearch(this.value)" onfocus="showModuleSearchResults()" onblur="hideModuleSearchResults()"
+               aria-label="Buscar módulos" aria-expanded="false" aria-controls="moduleSearchResults" autocomplete="off" role="combobox" aria-autocomplete="list">
+        <div id="moduleSearchResults" role="listbox" aria-label="Resultados de búsqueda" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--dark1);background-color:#FFFFFF;border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.35);z-index:1000;max-height:380px;overflow-y:auto;overflow-x:hidden;margin-top:4px;box-sizing:border-box;opacity:1"></div>
+      </div>
+    </div>
+    <nav id="nav-menu"></nav>
+
+  </div>
+
+  <!-- MAIN -->
+  <div id="main">
+    <div class="topbar">
+      <button type="button" id="menu-btn" onclick="toggleMobileSidebar()" aria-label="Abrir menú" title="Abrir menú"><svg viewBox="0 0 20 20" width="1em" height="1em" fill="currentColor"><path d="M3 5h14M3 10h14M3 15h14"/></svg></button>
+      <div class="topbar-title">
+        <h3 id="page-title">Dashboard</h3>
+        <p id="page-sub">Resumen general del hotel</p>
+      </div>
+      <div class="topbar-actions" id="topbar-actions"></div>
+      <label class="switch-toggle theme-toggle-btn" title="Cambiar tema">
+        <input type="checkbox" id="theme-switch-checkbox" onclick="toggleTheme()" aria-label="Cambiar tema" title="Cambiar tema">
+        <span class="switch-slider"></span>
+      </label>
+    </div>
+    <div class="content" id="page-content"></div>
+  </div>
+</div>
+
+
+<!-- TICKET PRINT 80mm / Carta -->
+<div id="ticket-preview-overlay">
+  <div id="ticket-preview-wrapper">
+    <h3 id="tpw-title">Vista previa del ticket</h3>
+    <div id="ticket-print"></div>
+    <div id="ticket-preview-actions">
+      <button type="button" class="btn btn-secondary btn-flex-gap" onclick="closeTicketPreview()"><svg viewBox="0 0 20 20" width="1em" height="1em" fill="currentColor"><path d="M11 4l-7 6 7 6M4 10h13"/></svg> Regresar al panel</button>
+      <button type="button" class="btn btn-secondary btn-flex-gap" id="ticket-format-toggle" onclick="toggleTicketFormat()"><svg viewBox="0 0 20 20" width="1em" height="1em" fill="currentColor"><rect x="3" y="3" width="14" height="14" rx="2"/></svg> Formato</button>
+      <button type="button" class="btn btn-primary btn-flex-gap" onclick="window.print()"><svg viewBox="0 0 20 20" width="1em" height="1em" fill="currentColor"><path d="M5 8V3h10v5m2 2a1 1 0 110-2 1 1 0 010 2zm-3 4H6v4h8v-4zm0-4H6v2h8v-2z"/></svg> Imprimir ticket</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div id="modal-container"></div>
+<div id="toast-container"></div>
+
+  <script src="./storageService.js"></script>
+  <script src="./backupService.js"></script>
+  <script src="./syncService.js"></script>
+  <script src="./updateService.js"></script>
+<script>
+  // Inicializar tema inmediatamente para evitar flash de contenido
+  (function() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.body.classList.add('dark-mode');
+    }
+  })();
+</script>
+<script>
+// Fallback síncrono para window.toast — evita "window.toast is not a function"
+// si el usuario hace login antes de que app.js/modules/ui.js termine de cargar.
+// Será sobrescrito por modules/ui.js cuando éste se cargue.
+if (typeof window.toast !== 'function') {
+  window.toast = function(msg, type) {
+    try {
+      var c = document.getElementById('toast-container');
+      if (c) {
+        var t = document.createElement('div');
+        t.className = 'toast ' + (type || 'info');
+        t.textContent = msg;
+        c.appendChild(t);
+        setTimeout(function(){
+          if (t.parentNode) {
+            t.classList.add('removing');
+            setTimeout(function(){ if (t.parentNode) t.parentNode.removeChild(t); }, 200);
+          }
+        }, type === 'error' ? 5000 : 3800);
+        return;
+      }
+    } catch(e) {}
+    if (type === 'error') console.error(msg); else console.log(msg);
+  };
+}
+</script>
+<script type="module">
+import './modules/security.js';
+import './modules/ui.js';
+import { doLogin, logout } from './modules/auth.js';
+window.doLogin = doLogin;
+window.logout = logout;
+</script>
+<script>
+(function () {
+  function loadApp(build) {
+    const s = document.createElement('script');
+    s.type = 'module';
+    s.src = build ? './app.js?v=' + encodeURIComponent(build) : './app.js';
+    document.body.appendChild(s);
+  }
+  async function go() {
+    try {
+      if (window.StorageService && StorageService.init) await StorageService.init();
+    } catch (e) {}
+    try {
+      if (window.location.protocol !== 'file:') {
+        const vr = await fetch('./version.json?t=' + Date.now(), { cache: 'no-store' });
+        if (vr.ok) {
+          const vj = await vr.json();
+          loadApp(vj && vj.build ? vj.build : '');
+          return;
+        }
+      }
+    } catch (e) {}
+    loadApp('');
+  }
+  go();
+})();
+</script>
+<script>
+(function () {
+  /* Sistema 100% offline - deshabilitar todas las solicitudes de red */
+  return; // Sistema offline - no hacer solicitudes de red
+})();
+</script>
+<script>
+(function () {
+  function bootBackup() {
+    if (!window.BackupService || !BackupService.startAutoBackup || !BackupService.buildPayload) return;
+    BackupService.startAutoBackup(function () { return BackupService.buildPayload(); }, 30 * 60 * 1000);
+  }
+  if (document.readyState === 'complete') setTimeout(bootBackup, 8000);
+  else window.addEventListener('load', function () { setTimeout(bootBackup, 8000); });
+})();
+</script>
+
+</body>
+</html>

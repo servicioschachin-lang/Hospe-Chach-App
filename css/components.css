@@ -1,0 +1,545 @@
+/* ── CARDS / TABLES ── */
+
+  .card {
+    background: var(--surface); 
+    border:1px solid var(--border);
+    border-radius:12px; 
+    overflow:hidden;
+    width: 100%;
+    box-sizing: border-box;
+    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  }
+  .card-header {
+    padding:18px 24px; border-bottom:1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .card-header h4 { font-size:0.95rem; font-weight:600; }
+  .card-body { 
+    padding:24px; 
+    overflow-x: auto; 
+    width: 100%;
+    box-sizing: border-box;
+  }
+  table { width:100%; max-width: 100%; border-collapse:collapse; font-size:0.87rem; }
+  th { padding:10px 16px; text-align:left; font-size:0.7rem; color:var(--text3); letter-spacing:1.5px; text-transform:uppercase; border-bottom:1px solid var(--border); font-weight:500; }
+  td { padding:12px 16px; border-bottom:1px solid var(--border); color:var(--text2); }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:var(--dark3); color:var(--text); }
+  .badge {
+    display:inline-flex; align-items:center; padding:3px 10px;
+    border-radius:20px; font-size:0.72rem; font-weight:600; letter-spacing:0.5px;
+  }
+  .badge-green { background:rgba(76,175,121,0.15); color:var(--green); }
+  .badge-red { background:rgba(224,86,86,0.15); color:var(--red); }
+  .badge-blue { background:rgba(91,143,232,0.15); color:var(--blue); }
+  .badge-orange { background:rgba(232,148,91,0.15); color:var(--orange); }
+  .badge-gold { background:rgba(201,168,76,0.15); color:var(--gold); }
+  .badge-purple { background:rgba(155,107,232,0.15); color:var(--purple); }
+  .badge-gray { background:rgba(158,163,184,0.15); color:var(--text2); }
+
+  
+/* ── ROOM PHOTOS ── */
+
+  .photo-upload-area {
+    border:2px dashed var(--border2); border-radius:10px;
+    padding:24px; text-align:center; cursor:pointer;
+    -webkit-transition:border-color 0.2s; transition:border-color 0.2s; background:var(--dark3);
+    position:relative;
+  }
+  .photo-upload-area:hover { border-color:var(--gold); }
+  .photo-upload-area input[type=file] {
+    position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;
+  }
+  .photo-upload-area .upload-icon { font-size:2rem; margin-bottom:8px; opacity:0.6; }
+  .photo-upload-area p { font-size:0.82rem; color:var(--text3); }
+  .photo-upload-area small { font-size:0.72rem; color:var(--text3); margin-top:4px; display:block; }
+  .photos-preview {
+    display:-webkit-box; display:-ms-flexbox; display:flex;
+    -ms-flex-wrap:wrap; flex-wrap:wrap; gap:10px; margin-top:12px;
+  }
+  .photo-thumb {
+    width:90px; height:70px; border-radius:8px; overflow:hidden;
+    position:relative; border:1px solid var(--border); background:var(--dark3);
+    -webkit-box-flex:0; -ms-flex:0 0 auto; flex:0 0 auto;
+  }
+  .photo-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+  .photo-thumb .photo-del {
+    position:absolute; top:3px; right:3px;
+    background:rgba(0,0,0,0.7); border:none; color:#fff;
+    border-radius:50%; width:20px; height:20px; font-size:0.7rem;
+    cursor:pointer; line-height:20px; text-align:center; padding:0;
+    display:none;
+  }
+  .photo-thumb:hover .photo-del { display:block; }
+  .room-card-photo-wrap {
+    position:relative;
+    margin:-18px -18px 10px -18px;
+    width:calc(100% + 36px);
+    max-width: calc(100% + 36px);
+    border-radius:6px 6px 0 0;
+    background:var(--dark3);
+    box-sizing: border-box;
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    /* Hide scrollbar for clean slider handled by webkit pseudo-element */
+  }
+  .room-card-photo-wrap::-webkit-scrollbar { display: none; }
+  .room-card-photo-wrap .room-card-img {
+    margin:0;
+    flex: 0 0 100%;
+    width:100%;
+    height:140px; /* Make the photo slightly taller for better mobile swiping */
+    object-fit:cover;
+    display:block;
+    border-radius:0;
+    scroll-snap-align: center;
+  }
+  .room-card-nav {
+    position:absolute; top:50%; -webkit-transform:translateY(-50%); transform:translateY(-50%);
+    width:30px; height:38px; border:none;
+    background:rgba(255,255,255,0.92);
+    color:var(--gold);
+    font-size:1.35rem; font-weight:600;
+    cursor:pointer; z-index:3; line-height:1; padding:0;
+    border-radius:6px;
+    box-shadow:0 2px 8px rgba(44,24,16,0.18);
+    -webkit-tap-highlight-color:transparent;
+    touch-action:manipulation;
+  }
+  .room-card-nav:hover { background:#fff; color:var(--gold-light); }
+  .room-card-nav--prev { left:6px; }
+  .room-card-nav--next { right:6px; }
+  .room-card-photo-idx {
+    position:absolute; bottom:5px; right:8px; z-index:3;
+    font-size:0.62rem; font-weight:600;
+    background:rgba(26,18,8,0.55); color:#fff;
+    padding:3px 7px; border-radius:10px;
+    letter-spacing:0.5px;
+  }
+  .room-card-img {
+    width:100%; height:90px; object-fit:cover;
+    border-radius:6px 6px 0 0; display:block; margin:-18px -18px 10px -18px;
+    width:calc(100% + 36px);
+  }
+  .room-card-no-img {
+    width:calc(100% + 36px); height:70px; margin:-18px -18px 10px -18px;
+    background:var(--dark3);
+    display:-webkit-box; display:-ms-flexbox; display:flex;
+    -webkit-box-align:center; -ms-flex-align:center; align-items:center;
+    -webkit-box-pack:center; -ms-flex-pack:center; justify-content:center;
+    font-size:2rem; opacity:0.3; border-radius:6px 6px 0 0;
+  }
+  .gallery-grid {
+    display:-webkit-box; display:-ms-flexbox; display:flex;
+    -ms-flex-wrap:wrap; flex-wrap:wrap; gap:8px; margin-top:12px;
+  }
+  .gallery-img {
+    width:120px; height:90px; border-radius:8px; overflow:hidden;
+    cursor:pointer; border:1px solid var(--border);
+  }
+  .gallery-img img { width:100%; height:100%; object-fit:cover; display:block; }
+  .lightbox {
+    position:fixed; inset:0; background:rgba(0,0,0,0.92);
+    display:-webkit-box; display:-ms-flexbox; display:flex;
+    -webkit-box-align:center; -ms-flex-align:center; align-items:center;
+    -webkit-box-pack:center; -ms-flex-pack:center; justify-content:center;
+    z-index:9000; cursor:pointer;
+  }
+  .lightbox img { max-width:95vw; max-height:90vh; border-radius:8px; object-fit:contain; }
+  .lightbox-close {
+    position:absolute; top:20px; right:24px;
+    color:#fff; font-size:2rem; cursor:pointer; background:none; border:none;
+    line-height:1;
+  }
+  @media (max-width:768px) {
+    .photo-thumb { width:72px; height:56px; }
+    .gallery-img { width:90px; height:68px; }
+    .room-card-img { height:70px; }
+    .room-card-photo-wrap .room-card-img { height:70px; }
+  }
+
+
+  
+  /* Reminder badge */
+  .reminder-badge {
+    background:var(--red); color:#fff; font-size:0.65rem; font-weight:700;
+    min-width:18px; height:18px; border-radius:9px;
+    display:inline-flex; align-items:center; justify-content:center;
+    margin-left:auto; padding:0 4px;
+  }
+  /* Clean status colors */
+  .badge-gold { background:rgba(201,168,76,0.15); color:var(--gold); }
+  /* Text colors */
+  .text-red   { color:var(--red) !important; }
+  .text-green { color:var(--green) !important; }
+  .text-blue  { color:var(--blue) !important; }
+  .text-orange{ color:var(--orange) !important; }
+  /* Key deposit badge on room card */
+  .room-card .room-price { font-size:0.72rem; }
+  /* Dashboard action cards */
+  @media (min-width:769px) {
+    .action-card { background: var(--surface); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border:1px solid var(--border); border-radius:10px; padding:14px 16px; margin-bottom:10px; }
+    .action-card-title { font-size:0.95rem; font-weight:600; margin-bottom:4px; }
+    .action-card-sub { font-size:0.78rem; color:var(--text3); margin-bottom:10px; }
+    .action-card-meta { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+    .action-card-meta span { font-size:0.78rem; color:var(--text2); background:var(--dark3); padding:3px 8px; border-radius:4px; }
+    .action-card-btns { display:flex; gap:8px; flex-wrap:wrap; }
+    .action-card-btns .btn { padding:10px 16px; }
+  }
+
+/* ══════════════════════════════════════════════
+     RECIBO / TICKET (80mm térmico y Carta)
+     ══════════════════════════════════════════════ */
+  @media print {
+    body > * { display:none !important; }
+    #ticket-preview-overlay, #ticket-preview-overlay * { display:block !important; }
+    #ticket-preview-overlay { position:static !important; background:none !important; padding:0 !important; margin:0 !important; }
+    #ticket-preview-wrapper { box-shadow:none !important; padding:0 !important; background:none !important; border-radius:0 !important; width:100% !important; max-width:100% !important; margin:0 !important; }
+    #tpw-title, #ticket-preview-actions { display:none !important; }
+    #ticket-print { background:#fff !important; margin:0 auto !important; font-family: Arial, Helvetica, sans-serif; }
+    #ticket-print, #ticket-print * { color:#000 !important; text-decoration: none !important; border: none !important; box-shadow: none !important; outline: none !important; }
+    .ticket-logo-wrap { text-align:center; padding:0 !important; display:block !important; }
+    .ticket-row { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+    .ticket-row-label { flex: 1 1 auto; min-width: 0; white-space: normal; word-break: break-word; }
+    .ticket-row-value { flex: 0 0 auto; text-align: right; font-weight: bold; white-space: nowrap; }
+    .ticket-section-title { font-weight:bold; margin-top:6px; }
+    .ticket-total-box { text-align:center; }
+    .ticket-total-label { font-weight:bold; }
+    .ticket-total-amount { font-weight:bold; }
+    .ticket-note { white-space:normal; line-height:1.4; }
+    .ticket-barcode-placeholder { display:none; }
+    hr.ticket-divider { display:none; }
+    .ticket-footer { text-align:center; margin-top:6px; }
+
+    /* — 80mm térmico — */
+    #ticket-print.ticket-f-80mm { width:80mm !important; max-width:80mm !important; padding:0 7mm 0 7mm !important; font-size: 10px; line-height: 1.3; }
+    #ticket-print.ticket-f-80mm .ticket-logo-wrap { margin:0 0 2mm 0 !important; }
+    #ticket-print.ticket-f-80mm .ticket-logo-img { width:100% !important; max-width:100% !important; height:auto !important; display:block !important; object-fit:contain !important; margin:0 !important; padding:0 !important; border-radius:0 !important; }
+    #ticket-print.ticket-f-80mm .ticket-hotel-name { display:none !important; }
+    #ticket-print.ticket-f-80mm .ticket-company-name, #ticket-print.ticket-f-80mm .ticket-company-sub { display:none !important; }
+    #ticket-print.ticket-f-80mm .ticket-subtitle { text-align:center; font-size:8pt; margin-bottom:2px; }
+    #ticket-print.ticket-f-80mm .ticket-row { font-size:9pt; padding:0.35mm 0; gap:2.5mm; }
+    #ticket-print.ticket-f-80mm .ticket-section-title { font-size:9pt; padding:0.4mm 0 0 0; }
+    #ticket-print.ticket-f-80mm .ticket-total-box { margin:1mm 0; }
+    #ticket-print.ticket-f-80mm .ticket-total-label { font-size:9pt; font-weight:normal; }
+    #ticket-print.ticket-f-80mm .ticket-total-amount { font-size:16pt; }
+    #ticket-print.ticket-f-80mm .ticket-note { font-size:8px; }
+    #ticket-print.ticket-f-80mm .ticket-footer { font-size:8px; margin-top:2mm; }
+
+    /* — Carta (letter) — */
+    #ticket-print.ticket-f-carta { width:100% !important; max-width:210mm !important; padding:15mm 20mm !important; font-size:12pt; line-height:1.5; }
+    #ticket-print.ticket-f-carta .ticket-logo-wrap { margin:0 0 8px 0 !important; }
+    #ticket-print.ticket-f-carta .ticket-logo-img { width:100% !important; max-width:100% !important; height:auto !important; display:block !important; object-fit:contain !important; margin:0 !important; padding:0 !important; border-radius:0 !important; }
+    #ticket-print.ticket-f-carta .ticket-company-name { font-size:26px; font-weight:bold; text-align:center; margin-top:6px; }
+    #ticket-print.ticket-f-carta .ticket-company-sub { text-align:center; font-size:13px; letter-spacing:3px; margin-top:3px; }
+    #ticket-print.ticket-f-carta .ticket-subtitle { text-align:center; font-size:12px; margin-bottom:4px; }
+    #ticket-print.ticket-f-carta hr.ticket-divider { display:block !important; border: none !important; border-top:1.5px solid #000 !important; margin:10px 0; }
+    #ticket-print.ticket-f-carta .ticket-row { font-size:12pt; padding:4px 0; line-height:1.5; }
+    #ticket-print.ticket-f-carta .ticket-section-title { font-size:13px; letter-spacing:1px; text-transform:uppercase; margin-top:10px; }
+    #ticket-print.ticket-f-carta .ticket-total-box { margin:20px auto; border:2px solid #000; border-radius:12px; padding:18px 24px; max-width:85%; }
+    #ticket-print.ticket-f-carta .ticket-total-label { font-size:13px; letter-spacing:2px; font-weight:bold; }
+    #ticket-print.ticket-f-carta .ticket-total-amount { font-size:32px; }
+    #ticket-print.ticket-f-carta .ticket-note { font-size:11pt; }
+    #ticket-print.ticket-f-carta .ticket-footer { font-size:11pt; margin-top:20px; letter-spacing:1px; }
+  }
+
+#ticket-preview-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.75); z-index: 8000;
+    align-items: flex-start; justify-content: center;
+    padding: 20px; box-sizing: border-box; overflow-y: auto;
+  }
+  #ticket-preview-overlay.open { display: flex; }
+  #ticket-preview-wrapper {
+    background: #fff; border-radius: 12px; padding: 16px;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 12px; max-height: calc(100vh - 40px); overflow-y: auto;
+    box-shadow: 0 12px 48px rgba(0,0,0,0.3);
+    width: 100%; max-width: 480px; box-sizing: border-box; margin: auto;
+  }
+  #tpw-title {
+    font-family: Arial, sans-serif; font-size: 0.7rem;
+    color: #888; margin: 0; align-self: flex-start;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  #ticket-preview-actions { display: flex; gap: 8px; width: 100%; flex-wrap: wrap; justify-content: center; }
+  #ticket-preview-actions .btn { flex: 1; min-width: 110px; text-align: center; padding: 10px 16px !important; font-size: 0.85rem !important; }
+  #ticket-format-toggle { flex: 0 0 auto !important; min-width: 150px !important; }
+
+  #ticket-print { display: none; background: #fff; box-sizing: border-box !important; font-family: Arial, Helvetica, sans-serif; }
+  #ticket-preview-overlay.open #ticket-print { display: block !important; }
+  #ticket-print, #ticket-print * { color: #000 !important; }
+  hr.ticket-divider { display: none; }
+  #ticket-print .ticket-barcode-placeholder { display: none; }
+
+  .ticket-logo-wrap { text-align: center; margin: 0 0 6px 0 !important; width: 100% !important; padding: 0 !important; display: block !important; }
+  #ticket-print .ticket-hotel-name, .ticket-hotel-name { display: none !important; }
+  .ticket-note { white-space: normal; line-height: 1.4; }
+
+  /* — 80mm (vista previa) — */
+  #ticket-print.ticket-f-80mm { width: 80mm !important; max-width: 100% !important; padding: 0 7mm !important; font-size: 10px; line-height: 1.3; }
+  #ticket-print.ticket-f-80mm .ticket-logo-wrap { margin: 0 0 2mm 0 !important; }
+  #ticket-print.ticket-f-80mm .ticket-logo-wrap .ticket-logo-img { width: 100% !important; max-width: 100% !important; height: auto !important; display: block !important; object-fit: contain !important; margin: 0 !important; padding: 0 !important; border-radius: 0 !important; }
+  #ticket-print.ticket-f-80mm .ticket-company-name, #ticket-print.ticket-f-80mm .ticket-company-sub { display: none !important; }
+  #ticket-print.ticket-f-80mm .ticket-subtitle { text-align: center; font-size: 9px; margin-bottom: 2px; }
+  #ticket-print.ticket-f-80mm .ticket-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; font-size: 10px; padding: 1px 0; line-height: 1.35; }
+  #ticket-print.ticket-f-80mm .ticket-row-label { flex: 1 1 auto; min-width: 0; white-space: normal; word-break: break-word; }
+  #ticket-print.ticket-f-80mm .ticket-row-value { flex: 0 0 auto; text-align: right; font-weight: bold; white-space: nowrap; }
+  #ticket-print.ticket-f-80mm .ticket-section-title { font-size: 10px; font-weight: bold; padding: 2px 0 0 0; }
+  #ticket-print.ticket-f-80mm .ticket-total-box { text-align: center; margin: 4px 0; }
+  #ticket-print.ticket-f-80mm .ticket-total-label { font-size: 10px; font-weight: normal; }
+  #ticket-print.ticket-f-80mm .ticket-total-amount { font-size: 16px; font-weight: bold; }
+  #ticket-print.ticket-f-80mm .ticket-note { font-size: 8px; }
+  #ticket-print.ticket-f-80mm .ticket-footer { text-align: center; font-size: 8px; margin-top: 4px; }
+  #ticket-print.ticket-f-80mm .ticket-barcode-placeholder { text-align: center; font-size: 11px; letter-spacing: 2px; margin: 3px 0; }
+
+  /* — Carta (vista previa) — */
+  #ticket-print.ticket-f-carta { width: 100% !important; max-width: 210mm !important; padding: 15mm 20mm !important; font-size: 12pt; line-height: 1.5; }
+  #ticket-print.ticket-f-carta hr.ticket-divider { display: block; border: none; border-top: 1px solid #ddd; margin: 10px 0; }
+  #ticket-print.ticket-f-carta .ticket-logo-wrap { margin-bottom: 8px !important; }
+  #ticket-print.ticket-f-carta .ticket-logo-img { width: 100% !important; max-width: 100% !important; height: auto !important; display: block !important; object-fit: contain !important; margin: 0 !important; padding: 0 !important; border-radius: 0 !important; }
+  #ticket-print.ticket-f-carta .ticket-company-name { font-size: 26px; font-weight: bold; text-align: center; margin-top: 6px; }
+  #ticket-print.ticket-f-carta .ticket-company-sub { text-align: center; font-size: 13px; letter-spacing: 3px; margin-top: 3px; }
+  #ticket-print.ticket-f-carta .ticket-subtitle { text-align: center; font-size: 12px; margin-bottom: 4px; }
+  #ticket-print.ticket-f-carta .ticket-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; font-size: 12pt; padding: 4px 0; line-height: 1.5; }
+  #ticket-print.ticket-f-carta .ticket-row-label { flex: 1 1 auto; min-width: 0; white-space: normal; word-break: break-word; }
+  #ticket-print.ticket-f-carta .ticket-row-value { flex: 0 0 auto; text-align: right; font-weight: bold; white-space: nowrap; }
+  #ticket-print.ticket-f-carta .ticket-section-title { font-size: 13px; font-weight: bold; letter-spacing: 1px; padding: 8px 0 4px 0; text-transform: uppercase; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-bottom: 4px; }
+  #ticket-print.ticket-f-carta .ticket-total-box { text-align: center; margin: 20px auto; border: 2px solid #000; border-radius: 12px; padding: 18px 24px; max-width: 85%; }
+  #ticket-print.ticket-f-carta .ticket-total-label { font-size: 13px; letter-spacing: 2px; font-weight: bold; }
+  #ticket-print.ticket-f-carta .ticket-total-amount { font-size: 32px; font-weight: bold; }
+  #ticket-print.ticket-f-carta .ticket-note { font-size: 11pt; }
+  #ticket-print.ticket-f-carta .ticket-footer { text-align: center; font-size: 11pt; margin-top: 20px; letter-spacing: 1px; }
+  #ticket-print.ticket-f-carta .ticket-barcode-placeholder { text-align: center; font-size: 13px; letter-spacing: 2px; margin: 8px 0; }
+
+  /* Logo uploader in settings */
+  .logo-upload-area {
+    border: 2px dashed var(--border2);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    background: var(--dark3);
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  .logo-upload-area:hover { border-color: var(--gold); }
+  .logo-upload-area.drag-over { border-color: var(--gold); background: rgba(200,150,12,0.12); transform: scale(1.01); }
+  .logo-upload-area input[type=file] {
+    position: absolute; inset: 0; opacity: 0;
+    cursor: pointer; width: 100%; height: 100%;
+  }
+  .logo-preview-box {
+    margin-top: 10px; text-align: center;
+  }
+  .logo-preview-box img {
+    max-width: 180px; max-height: 80px;
+    border-radius: 6px; border: 1px solid var(--border);
+    object-fit: contain; background: #fff; padding: 4px;
+  }
+
+  /* Inline style replacements to comply with linter rules */
+  .u-pb-4 { padding-bottom: 4px; }
+  .login-title-custom { font-size: 1.1rem; margin-bottom: 6px; line-height: 1.2; }
+  .sidebar-header-custom { padding: 12px 16px 8px !important; text-align: center; }
+  .sidebar-title-custom { font-size: 0.8rem; line-height: 1.2; margin-bottom: 4px; }
+  .brand-hospedaje {
+    display: block;
+    font-size: 0.75em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0.75;
+  }
+  .brand-name {
+    display: block;
+    font-size: 1.15em;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .sidebar-sub-custom { font-size: 0.7rem; }
+  .cursor-pointer { cursor: pointer; }
+  .display-none { display: none !important; }
+  .color-red { color: #C62828 !important; }
+  .color-red-light { color: #E07070 !important; }
+  .valign-icon { vertical-align: -0.15em; }
+  .btn-flex-gap { display: flex !important; align-items: center !important; gap: 6px !important; }
+  .login-hint-text { color: var(--text3); font-size: 0.85rem; margin-top: 16px; text-align: center; }
+  .login-version-container { margin-top: 16px; text-align: center; }
+  .login-version-text { color: var(--text3); font-size: 0.75rem; margin-bottom: 8px; }
+  .logout-text { margin-left: 8px; font-size: 0.9em; }
+  .theme-toggle-btn { margin-left: 8px; }
+
+/* Modal Animations */
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes modalFadeOut {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.95); }
+}
+.modal-overlay {
+  animation: modalFadeIn 0.2s ease-out;
+}
+.modal-overlay.closing {
+  animation: modalFadeOut 0.15s ease-in forwards;
+}
+
+/* Global Search Results */
+#global-search-results div[style*="cursor:pointer"]:hover {
+  background: var(--dark3) !important;
+  border-color: var(--blue) !important;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border);
+  border-top-color: var(--blue);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Toast Improvements */
+.toast {
+  animation: toastSlideIn 0.3s ease-out;
+}
+@keyframes toastSlideIn {
+  from { opacity: 0; transform: translateX(100%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.toast.removing {
+  animation: toastSlideOut 0.2s ease-in forwards;
+}
+@keyframes toastSlideOut {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(100%); }
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 12px;
+}
+.pagination button {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text2);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+.pagination button:hover:not(:disabled) {
+  background: var(--gold);
+  color: #fff;
+  border-color: var(--gold);
+}
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.pagination button.active {
+  background: linear-gradient(135deg, #C8960C 0%, #8B6914 100%);
+  color: #fff;
+  border-color: rgba(255,215,100,0.4);
+}
+.pagination-info {
+  font-size: 0.8rem;
+  color: var(--text3);
+  margin: 0 8px;
+}
+
+/* Theme Switch Toggle */
+.switch-toggle {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+.switch-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.switch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: var(--border2);
+  transition: 0.3s;
+  border-radius: 24px;
+}
+.switch-slider:before {
+  position: absolute;
+  content: "";
+  display: block;
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #fff;
+  transition: 0.3s;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+input:checked + .switch-slider {
+  background-color: var(--gold);
+}
+input:checked + .switch-slider:before {
+  transform: translateX(20px);
+  content: "";
+  background-color: #1e1e1e;
+}
+
+/* Module Search Styles */
+.module-search-item:hover {
+  background: var(--dark3) !important;
+}
+.module-search-item:active {
+  transform: scale(0.99);
+}
+.module-search-item.highlighted {
+  background: var(--primary-bg) !important;
+  box-shadow: inset 3px 0 0 var(--primary);
+  /* no layout shift: inset shadow instead of border-left */
+}
+
+#moduleSearchResults {
+  z-index: 9999 !important;
+  background: var(--dark1) !important;
+  background-color: var(--dark1) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  max-height: 380px !important;
+  isolation: isolate;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  opacity: 1 !important;
+}
+
+.module-search-item {
+  transition: background 0.15s ease;
+  background: var(--dark1);
+  box-sizing: border-box;
+  word-break: break-word;
+  white-space: normal;
+  min-width: 0;
+}
+
+
