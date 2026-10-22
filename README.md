@@ -1,6 +1,6 @@
-# Hospedaje Ku' Kanche — Sistema de Gestión
+# Hospe Chach App — Sistema de Gestión
 
-Sistema de gestión integral para el **Hospedaje Ku' Kanche** (Guatemala). Es una *Progressive Web App (PWA)* que funciona **100 % offline**: toda la información se guarda en el navegador (IndexedDB) y no requiere conexión a internet ni servidor de base de datos para su operación diaria.
+Sistema de gestión integral para el **Hospedaje** (Guatemala). Es una *Progressive Web App (PWA)* que funciona **100 % offline**: toda la información se guarda en el navegador (IndexedDB) y no requiere conexión a internet ni servidor de base de datos para su operación diaria.
 
 > **Versión actual:** 1.3.9 · Build `2026-08-11_v23`
 
