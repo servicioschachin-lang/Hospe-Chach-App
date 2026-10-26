@@ -1,9 +1,9 @@
 {
-  "name": "Hospe Chach App",
-  "short_name": "Hospe Chach",
+  "name": "Hosped Chach App",
+  "short_name": "Hosped Chach",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#F7F3EE",
+  "background_color": "white",
   "theme_color": "#8B6914",
   "icons": [
     {
