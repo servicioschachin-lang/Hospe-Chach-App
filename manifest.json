@@ -1,9 +1,10 @@
+
 {
   "name": "Hosped Chach App",
   "short_name": "Hosped Chach",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "black",
+  "background_color": "transparent",
   "theme_color": "#8B6914",
   "icons": [
     {
