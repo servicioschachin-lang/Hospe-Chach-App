@@ -4,7 +4,7 @@
   "short_name": "Hosped Chach",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "transparent",
+  "background_color": #000000,
   "theme_color": "#8B6914",
   "icons": [
     {
